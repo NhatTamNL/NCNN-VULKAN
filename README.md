@@ -48,3 +48,33 @@ x1:1152 y1:547 x2:1437 y2:1101  person:80.35%
 x1:435 y1:283 x2:599 y2:472  potted plant:69.96%
 x1:1486 y1:452 x2:1649 y2:738  person:65.72%
 ```
+
+* Train 
+```
+python3 train.py --yaml my_config/person.yml
+```
+
+* Test and Export ONNX
+```
+python3 test.py --yaml configs/coco.yaml --weight checkpoint/... --img data/3.jpg --onnx
+```
+* Convert 
+```
+./bin/onnx2ncnn ../FastestDet.onnx FastestDet.param FastestDet.bin
+./bin/ncnnoptimize FastestDet.param FastestDet.bin FastestDet-opt.param FastestDet-opt.bin 1
+
+```
+
+* Compile without Makefile
+```
+g++ -o FastestDet FastestDet.cpp -I include/ncnn -I include/glslang \
+    lib/libncnn.a \
+    lib/libglslang.a \
+    lib/libMachineIndependent.a \
+    lib/libGenericCodeGen.a \
+    lib/libOGLCompiler.a \
+    lib/libOSDependent.a \
+    lib/libSPIRV.a \
+    lib/libglslang-default-resource-limits.a \
+    -ldl -fopenmp `pkg-config --libs --cflags opencv4`
+```

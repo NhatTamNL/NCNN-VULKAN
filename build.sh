@@ -1,24 +1,4 @@
-# g++ -o FastestDet FastestDet.cpp -I include/ncnn -I include/glslang lib/libncnn.a `pkg-config --libs --cflags opencv4` -fopenmp
+make clean all
 
-g++ -o FastestDet FastestDet.cpp -I include/ncnn -I include/glslang \
-    lib/libncnn.a \
-    lib/libglslang.a \
-    lib/libMachineIndependent.a \
-    lib/libGenericCodeGen.a \
-    lib/libOGLCompiler.a \
-    lib/libOSDependent.a \
-    lib/libSPIRV.a \
-    lib/libglslang-default-resource-limits.a \
-    -ldl -fopenmp `pkg-config --libs --cflags opencv4`
-
-# g++ -o FastestDet FastestDet_org.cpp -I include/ncnn -I include/glslang \
-#     lib/libncnn.a \
-#     lib/libglslang.a \
-#     lib/libMachineIndependent.a \
-#     lib/libGenericCodeGen.a \
-#     lib/libOGLCompiler.a \
-#     lib/libOSDependent.a \
-#     lib/libSPIRV.a \
-#     lib/libglslang-default-resource-limits.a \
-#     -ldl -fopenmp `pkg-config --libs --cflags opencv4`
-
+# ./build/FastestDet FastestDet-opt.bin FastestDet-opt.param /media/tamnln/DATA/video_test/nam_ngoi.avi
+./build/FastestDet FastestDet-opt.bin FastestDet-opt.param rtsp://rtsp:rtsp@192.168.11.149/profile1

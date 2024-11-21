@@ -5,17 +5,22 @@
 #include "benchmark.h"
 #include <opencv2/opencv.hpp>
 
+// const char *class_names[] = 
+// {
+//     "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
+//     "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
+//     "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
+//     "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
+//     "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
+//     "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
+//     "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone",
+//     "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
+//     "hair drier", "toothbrush"
+// };
+
 const char *class_names[] = 
 {
-    "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
-    "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
-    "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
-    "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
-    "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-    "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
-    "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone",
-    "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
-    "hair drier", "toothbrush"
+    "person"
 };
 
 float Sigmoid(float x)
@@ -106,17 +111,12 @@ int nmsHandle(std::vector<TargetBox> &src_boxes, std::vector<TargetBox> &dst_box
 int fasetest_detect(cv::Mat srcImg, const char *model_bin, const char *model_param,  ncnn::Net &net, std::vector<TargetBox> &dst_boxes)
 {
     int class_num = sizeof(class_names) / sizeof(class_names[0]);
-    float thresh = 0.65;
+    float thresh = 0.5;
 
-    int input_width = 352;
-    int input_height = 352;
-
-    // ncnn::Net net;
-    // net.opt.use_vulkan_compute = true;
-    // net.opt.num_threads = 4;
-    // net.load_param(model_param);
-    // net.load_model(model_bin);
-    // printf("ncnn model load sucess...\n");
+    // int input_width = 352;
+    // int input_height = 352;
+    int input_width = 256;
+    int input_height = 160;
 
     int img_width = srcImg.cols;
     int img_height = srcImg.rows;
@@ -134,7 +134,8 @@ int fasetest_detect(cv::Mat srcImg, const char *model_bin, const char *model_par
     ex.input("input.1", input);
 
     ncnn::Mat output;
-    ex.extract("758", output);
+    // ex.extract("758", output);
+    ex.extract("734", output);
     printf("output: %d, %d, %d\n", output.c, output.h, output.w);
 
     std::vector<TargetBox> target_boxes;
@@ -236,6 +237,12 @@ int inference_video(const char *model_bin, const char *model_param, char *video_
 
     cv::VideoCapture cap(video_path);
 
+    if (!cap.isOpened())
+    {
+        std::cerr << "Error: Unable to open video or RTSP stream: " << video_path << std::endl;
+        return -1;
+    }
+
     ncnn::Net net;
     net.opt.use_vulkan_compute = true;
     net.opt.num_threads = 4;
@@ -263,9 +270,10 @@ int inference_video(const char *model_bin, const char *model_param, char *video_
         draw_box(frame, nms_boxes);
 
         cv::imshow("demo", frame);
-        if (cv::waitKey(20) >= 0) break;
-        
+
         nms_boxes.clear();
+
+        if (cv::waitKey(1) >= 0) break;
     }
     cap.release();
     cv::destroyAllWindows();
